@@ -3,15 +3,23 @@ using UnityEngine;
 public class PlayerStateMachine : StateMachine
 {
     /*
-     * The input rreader provides the player input data.
+     * The input reader provides the player input data.
      */
-    [field: SerializeField]
-    public InputReader InputReader {  get; private set; }
-    
+    [field: SerializeField] public InputReader InputReader {  get; private set; }
+    [field: SerializeField] public CharacterController Controller { get; private set; }
+    public Vector3 MovementVector;
     public float playerSpeed = 5.0f;
+
+    //Camera movement variables
+    [field: SerializeField]public float RotationDamping { get; private set; }
+    [field: SerializeField]public float FreeLookMovementSpeed { get; private set; }
+    public Transform MainCameraTransform { get; private set; }
+    
 
     private void Start()
     {
-        SwitchState(new PlayerTestState(this));
+        MainCameraTransform = Camera.main.transform;
+
+        SwitchState(new PlayerFreeLookState(this));
     }
 }
