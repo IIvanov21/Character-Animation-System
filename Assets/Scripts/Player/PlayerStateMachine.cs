@@ -14,7 +14,13 @@ public class PlayerStateMachine : StateMachine
     [field: SerializeField]public float RotationDamping { get; private set; }
     [field: SerializeField]public float FreeLookMovementSpeed { get; private set; }
     public Transform MainCameraTransform { get; private set; }
-    
+
+    //Animation variables
+    [field: SerializeField] public Animator Animator { get; private set; }
+
+    //Targeting References
+    [field: SerializeField]public Targeter Targeter { get; private set; }
+    [field: SerializeField]public float TargetingMovementSpeed {  get; private set; }
 
     private void Start()
     {

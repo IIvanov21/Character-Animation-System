@@ -4,6 +4,12 @@ public class PlayerFreeLookState : PlayerBaseState
 {
     public PlayerFreeLookState(PlayerStateMachine stateMachine) : base(stateMachine) { }
 
+    /*
+     * Animation variables
+     */
+    private readonly int FreeLookSpeedHash = Animator.StringToHash("FreeLookSpeed");
+    private const float AnimatorDampTime = 0.1f;
+
     public override void Enter()
     {
     }
@@ -47,6 +53,17 @@ public class PlayerFreeLookState : PlayerBaseState
 
     private void FaceMovementDirection(float deltaTime)
     {
+        //Animation Handling
+        //Check if there is no movement input
+        if(stateMachine.InputReader.MovementValue == Vector2.zero)
+        {
+            stateMachine.Animator.SetFloat(FreeLookSpeedHash,0, AnimatorDampTime,deltaTime);
+            return;//Exit early because there is no movement
+        }
+
+        //If there is movement
+        stateMachine.Animator.SetFloat(FreeLookSpeedHash, 1, AnimatorDampTime,deltaTime);
+
         stateMachine.transform.rotation = Quaternion.Lerp(stateMachine.transform.rotation,
             Quaternion.LookRotation(stateMachine.MovementVector), deltaTime * stateMachine.RotationDamping);
     }
