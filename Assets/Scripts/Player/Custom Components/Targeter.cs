@@ -26,13 +26,30 @@ public class Targeter : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        
+        if (!other.TryGetComponent<Target>(out Target target))
+        {
+            //If no Target is found, exit the method early.
+            return;
+        }
+
+        //If target is found add it to the list of targets and subscribe the RemoveTarget method to the OnDestroyed event.
+        targets.Add(target);
+        target.OnDestroyed += RemoveTarget;
+
     }
 
     private void OnTriggerExit(Collider other)
     {
-        
+        if (!other.TryGetComponent<Target>(out Target target))
+        {
+            //If no Target is found, exit the method early.
+            return;
+        }
+
+        //If target found run the RemoveTarget to tidy up.
+        RemoveTarget(target);
     }
+
 
     //Method to select the closest target within the camera's viewport
     public bool SelectTarget()

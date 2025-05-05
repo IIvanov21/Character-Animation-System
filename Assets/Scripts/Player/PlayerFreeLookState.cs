@@ -8,14 +8,19 @@ public class PlayerFreeLookState : PlayerBaseState
      * Animation variables
      */
     private readonly int FreeLookSpeedHash = Animator.StringToHash("FreeLookSpeed");
+    private readonly int FreeLookBlendTree = Animator.StringToHash("FreeLookBlendTree");
     private const float AnimatorDampTime = 0.1f;
 
     public override void Enter()
     {
+        stateMachine.Animator.CrossFadeInFixedTime(FreeLookBlendTree, AnimatorDampTime);
+        //Bind our Target event to the Input Reader
+        stateMachine.InputReader.TargetEvent += OnTarget;
     }
 
     public override void Exit()
     {
+        stateMachine.InputReader.TargetEvent -= OnTarget;
     }
 
     public override void Tick(float deltaTime)
@@ -66,5 +71,18 @@ public class PlayerFreeLookState : PlayerBaseState
 
         stateMachine.transform.rotation = Quaternion.Lerp(stateMachine.transform.rotation,
             Quaternion.LookRotation(stateMachine.MovementVector), deltaTime * stateMachine.RotationDamping);
+    }
+
+    private void OnTarget()
+    {
+        Debug.Log("Trying to target");
+        if (!stateMachine.Targeter.SelectTarget())
+        {
+            Debug.Log("Failed");
+            return;
+        }
+
+        stateMachine.SwitchState(new PlayerTargetingState(stateMachine));
+        
     }
 }
