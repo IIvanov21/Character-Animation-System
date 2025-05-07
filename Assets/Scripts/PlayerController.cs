@@ -7,10 +7,20 @@ public class PlayerController : NetworkBehaviour
     Vector3 movement;
     public float playerSpeed;
 
+    NetworkVariable<int> playerScore = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Owner);
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        
+        //playerScore.Value= 25;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        playerScore.Value = 0;
+        playerScore.OnValueChanged += (oldValue, newValue) => { Debug.Log($"{OwnerClientId}Score channged: {oldValue}->{newValue}"); };
+
     }
 
     // Update is called once per frame
@@ -37,6 +47,10 @@ public class PlayerController : NetworkBehaviour
             TestClientRpc();
         }
 
+        if(IsOwner && Input.GetKeyDown(KeyCode.Space))
+        {
+            playerScore.Value = Random.Range(0, 100);
+        }
     }
 
     [ServerRpc]
@@ -49,5 +63,18 @@ public class PlayerController : NetworkBehaviour
     void TestClientRpc()
     {
         Debug.Log("ClientRpc called from server");
+    }
+
+    [Rpc(SendTo.Server)]
+    void TestToServerRpc()
+    {
+        Debug.Log($"[Rpc->Server] From client: {OwnerClientId}");
+    }
+
+    [Rpc(SendTo.Everyone)]
+    void TestToEveryoneRpc()
+    {
+        Debug.Log("[Rpc->Cleint] Called from server.");
+
     }
 }
